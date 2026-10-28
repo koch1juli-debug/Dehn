@@ -106,7 +106,11 @@ const nc=()=>Math.max(-1,...S.routines.map((r,i)=>r.col??i))+1;
 const PAL=["#6366f1","#f59e0b","#10b981","#ef4444","#06b6d4","#a855f7"];
 function mins(r){const it=r.items.filter(ex).map(ex);const s=it.reduce((a,e)=>a+tot(r,e),0)+rs(r)*Math.max(0,it.length-1);return Math.max(1,Math.round(s/60))}
 const tage=n=>n+(n===1?" Tag":" Tage")+" in Folge";
-function beep(f,ms){try{if(S.snd===false||S.vol===0)return;if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=.3*(S.vol??50)/100;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+ms/1000)}catch(e){}}
+let KA=null;
+function ses(){try{if(navigator.audioSession)navigator.audioSession.type=S.ses===false?"auto":"playback"}catch(e){}}
+function keep(){try{if(S.ses===false||navigator.audioSession)return;if(!KA){KA=new Audio("data:audio/wav;base64,UklGRmQGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YUAGAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA");KA.loop=true}KA.play().catch(()=>{})}catch(e){}}
+function kp(){try{if(KA)KA.pause()}catch(e){}}
+function beep(f,ms){try{if(S.snd===false||S.vol===0)return;ses();if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==="suspended")AC.resume();const o=AC.createOscillator(),g=AC.createGain();o.frequency.value=f;g.gain.value=.3*(S.vol??50)/100;o.connect(g);g.connect(AC.destination);o.start();o.stop(AC.currentTime+ms/1000)}catch(e){}}
 async function wl(on){try{if(on&&navigator.wakeLock)WL=await navigator.wakeLock.request("screen");else if(WL){await WL.release();WL=null}}catch(e){}}
 
 function home(){const n=streak(),nx=nextUp(),favs=S.routines.filter(r=>isFav(r)&&!(nx&&nx.r.id===r.id));
@@ -226,7 +230,7 @@ return `<div class="top"><button class="btn g sm" data-a="nav" data-id="home">Zu
 ${V.msg?`<p role="status"><b>${esc(V.msg)}</b></p>`:""}
 ${V.imp?`<div class="card"><h2>Backup einspielen?</h2><p>Die Datei enthält ${V.imp.d.routines.length} Routinen, ${V.imp.d.ex.length} Übungen und ${V.imp.d.done.length} Trainingstage. Deine aktuellen Daten werden dabei ersetzt.</p><div class="row"><button class="btn" data-a="impok">Ersetzen</button><button class="btn g" data-a="impno">Abbrechen</button></div></div>`:""}
 <div class="card"><h2>Darstellung</h2><div class="chips" role="group" aria-label="Farbschema">${[["dark","Dunkel"],["light","Hell"],["system","System"]].map(([k,l])=>{const on=(S.theme||"system")===k;return `<button class="chip${on?" on":""}" data-a="theme" data-p="${k}" aria-pressed="${on}">${on?"✓ ":""}${l}</button>`}).join("")}</div></div>
-<div class="card"><h2>Töne</h2><label class="chk"><input type="checkbox" data-f="snd" ${S.snd!==false?"checked":""}>Töne einschalten</label><label>Lautstärke<input type="range" min="0" max="100" step="5" value="${S.vol??50}" data-f="vol" ${S.snd===false?"disabled":""}></label><p class="mut">Beim Loslassen des Reglers hörst du einen Testton.</p></div>
+<div class="card"><h2>Töne</h2><label class="chk"><input type="checkbox" data-f="snd" ${S.snd!==false?"checked":""}>Töne einschalten</label><label>Lautstärke<input type="range" min="0" max="100" step="5" value="${S.vol??50}" data-f="vol" ${S.snd===false?"disabled":""}></label><label class="chk"><input type="checkbox" data-f="ses" ${S.ses!==false?"checked":""}>Auch bei aktivem Stumm-Schalter abspielen</label><p class="mut">Beim Loslassen des Reglers hörst du einen Testton. Ist die Option an, kann Musik aus anderen Apps während des Trainings pausieren.</p></div>
 <div class="card"><h2>Backup</h2><p class="mut">Speichert Routinen, Übungen, Einstellungen und Kalender in einer Datei. Lege sie in der Dateien-App oder in iCloud Drive ab.</p><p class="mut">${lb}</p><div class="row"><button class="btn" data-a="exp">Exportieren</button><button class="btn g" data-a="imp">Importieren</button></div><input type="file" id="imp" accept=".json,application/json" data-f="imp" hidden></div>`}
 
 function render(k){$("#app").innerHTML=({home,play,done,lib,edit,cal:calv,set:sett,rlib:rlibv,plan:planv})[V.n]();if(!k)window.scrollTo(0,0)}
@@ -257,11 +261,11 @@ function start(id){
 const r=S.routines.find(x=>x.id===id),ids=r.items.filter(ex);
 if(!ids.length)return;
 P={name:r.name,rid:r.id,col:rc(r),ids,idx:-1,rest:rs(r),d:Object.fromEntries(ids.map(i=>[i,dur(r,ex(i))]))};setPhase("rest",5000);
-V={n:"play"};beep(660,120);wl(true);clearInterval(T);T=setInterval(tick,200);render()}
-function stop(){clearInterval(T);P=null;wl(false);V={n:"home"};render()}
+V={n:"play"};beep(660,120);keep();wl(true);clearInterval(T);T=setInterval(tick,200);render()}
+function stop(){clearInterval(T);P=null;wl(false);kp();V={n:"home"};render()}
 function finish(){clearInterval(T);wl(false);const d=day();
 S.log=S.log||[];S.log.push({d,n:P.name,c:P.col,r:P.rid});if(!S.done.includes(d))S.done.push(d);save();
-beep(988,500);V={n:"done",name:P.name};P=null;render()}
+beep(988,500);setTimeout(kp,900);V={n:"done",name:P.name};P=null;render()}
 
 document.addEventListener("click",e=>{
 const b=e.target.closest("[data-a]");if(!b||b.disabled)return;
@@ -316,6 +320,7 @@ else if(f==="pname"){const pl=EP();pl.name=t.value.trim()||"Plan";const c=docume
 else if(f==="rfav"){S.routines.find(r=>r.id===V.id).fav=t.checked}
 else if(f==="imp"){const fl=t.files[0];t.value="";if(fl)importB(fl);return}
 else if(f==="snd"){S.snd=t.checked;render(1);if(S.snd)beep(660,200)}
+else if(f==="ses"){S.ses=t.checked;ses();beep(660,200)}
 else if(f==="vol"){S.vol=+t.value;beep(660,200)}
 else{const x=ex(t.dataset.id);if(f==="sec"){const v=parseInt(t.value,10);if(isNaN(v))delete x.sec;else x.sec=Math.max(10,Math.min(600,v))}else x[f]=t.value.trim()||(f==="name"?"Übung":"")}
 save()});
