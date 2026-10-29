@@ -130,7 +130,7 @@ ${!nx&&!favs.length?'<p class="mut">Noch keine Favoriten. Markiere Routinen in d
 <div class="row"><button class="btn g" data-a="cal">Kalender</button></div>`}
 
 function play(){const w=P.phase==="work",sw=P.phase==="switch",e=ex(P.ids[P.idx]),nx=ex(P.ids[P.idx+1]),s=Math.ceil(P.left/1000),pos=Math.min(P.ids.length,P.idx+(P.phase==="rest"?2:1));
-const pv=pvOn(),imE=P.phase==="rest"?nx:null,im=imE&&imE.img?imE.img:"";const title=pv?"NEXT":w?esc(e.name):sw?"Seitenwechsel":(P.idx<0?"Mach dich bereit":"Pause");
+const pv=pvOn(),imE=P.phase==="rest"?nx:(w?e:null),im=imE&&imE.img?imE.img:"";const title=pv?"NEXT":w?esc(e.name):sw?"Seitenwechsel":(P.idx<0?"Mach dich bereit":"Pause");
 const sub=pv?esc(nx.name):w?(e.desc?esc(e.desc):""):sw?"Wechsle auf die andere Seite":"Als Nächstes: "+esc(nx.name);
 const foot=pv?"":w?(e.one&&P.side===1?"Danach: Seitenwechsel":(nx?"Danach: "+esc(nx.name):"Letzte Übung")):sw?"Danach: Seite 2 von 2":"";
 const side=w&&e.one&&!pv?"Seite "+P.side+" von 2":"";
@@ -244,7 +244,7 @@ ${V.imp?`<div class="card"><h2>Backup einspielen?</h2><p>Die Datei enthält ${V.
 <div class="card"><h2>Darstellung</h2><div class="chips" role="group" aria-label="Farbschema">${[["dark","Dunkel"],["light","Hell"],["system","System"]].map(([k,l])=>{const on=(S.theme||"system")===k;return `<button class="chip${on?" on":""}" data-a="theme" data-p="${k}" aria-pressed="${on}">${on?"✓ ":""}${l}</button>`}).join("")}</div></div>
 <div class="card"><h2>Töne</h2><label class="chk"><input type="checkbox" data-f="snd" ${S.snd!==false?"checked":""}>Töne einschalten</label><label>Lautstärke<input type="range" min="0" max="100" step="5" value="${S.vol??50}" data-f="vol" ${S.snd===false?"disabled":""}></label><label class="chk"><input type="checkbox" data-f="ses" ${S.ses!==false?"checked":""}>Auch bei aktivem Stumm-Schalter abspielen</label><p class="mut">Beim Loslassen des Reglers hörst du einen Testton. Ist die Option an, kann Musik aus anderen Apps während des Trainings pausieren.</p></div>
 <div class="card"><h2>Backup</h2><p class="mut">Speichert Routinen, Übungen, Einstellungen und Kalender in einer Datei. Lege sie in der Dateien-App oder in iCloud Drive ab.</p><p class="mut">${lb}</p><div class="row"><button class="btn" data-a="exp">Exportieren</button><button class="btn g" data-a="imp">Importieren</button></div><input type="file" id="imp" accept=".json,application/json" data-f="imp" hidden></div>
-<p class="mut c">App-Version 4</p>`}
+<p class="mut c">App-Version 5</p>`}
 
 function render(k){$("#app").innerHTML=({home,play,done,lib,edit,cal:calv,set:sett,rlib:rlibv,plan:planv})[V.n]();if(!k)window.scrollTo(0,0)}
 
