@@ -63,6 +63,11 @@ input[type=range]{padding:0;border:0;height:32px;accent-color:var(--acc)}
 .prow label{margin:0;padding:10px;display:flex}
 .pn{flex:1;text-align:left;background:transparent;border:0;color:var(--ink);font:inherit;font-weight:600;padding:12px 0;cursor:pointer}
 .lg{display:inline-flex;align-items:center;gap:6px;margin-right:12px}
+.pic{position:absolute;left:11.5%;top:11.5%;width:77%;height:77%;border-radius:50%;object-fit:cover;background:#edeff2}
+.ringw.hasimg{margin:8px auto 10px}
+.tm{font-size:52px;font-weight:700;font-variant-numeric:tabular-nums;text-align:center;line-height:1.1;margin:2px 0 10px}
+.hd{display:flex;align-items:center;gap:10px}.hd input{flex:1;width:auto}
+.th{width:56px;height:56px;border-radius:50%;object-fit:cover;background:#edeff2;flex:none}
 .side{font-weight:700;color:var(--acc);min-height:1.4em;margin:0 0 4px}
 .pw{margin-bottom:8px}.pw .pick{margin-bottom:0}.dur{margin:6px 0 4px 12px}
 .top{display:flex;justify-content:space-between;align-items:center;gap:10px}
@@ -84,9 +89,10 @@ input[type=range]{padding:0;border:0;height:32px;accent-color:var(--acc)}
 <main id="app"></main>
 <script>
 const KEY="dehn-v1",C=2*Math.PI*88;
-const def={rest:10,defSym:30,defOne:30,
-ex:Array.from({length:10},(_,i)=>({id:"e"+(i+1),name:"E"+(i+1),desc:""})),
-routines:[{id:"r1",name:"Morgen",items:["e1","e2","e3","e4","e5"]},{id:"r2",name:"Abend",items:["e6","e7","e8","e9","e10"]}],
+const FIX=[{"id": "f01", "name": "Nach Oben Greifen", "img": "bilder/nach-oben-greifen.png", "one": 0}, {"id": "f02", "name": "Zehen Berühren", "img": "bilder/zehen-beruehren.png", "one": 0}, {"id": "f03", "name": "Brustöffner", "img": "bilder/brustoeffner.png", "one": 0}, {"id": "f04", "name": "Seitlicher Ausfallschritt", "img": "bilder/seitlicher-ausfallschritt.png", "one": 1}, {"id": "f05", "name": "Ausfallschritt", "img": "bilder/ausfallschritt.png", "one": 1}, {"id": "f06", "name": "Kindeshaltung", "img": "bilder/kindeshaltung.png", "one": 0}, {"id": "f07", "name": "Thunderbolt", "img": "bilder/thunderbolt.png", "one": 0}, {"id": "f08", "name": "Taube", "img": "bilder/taube.png", "one": 1}, {"id": "f09", "name": "Sitzender Twist", "img": "bilder/sitzender-twist.png", "one": 1}, {"id": "f10", "name": "Knie zur Brust", "img": "bilder/knie-zur-brust.png", "one": 0}, {"id": "f11", "name": "Figur Vier Liegend", "img": "bilder/figur-vier-liegend.png", "one": 1}, {"id": "f12", "name": "Oberschenkelrückseite Liegend", "img": "bilder/oberschenkelrueckseite-liegend.png", "one": 1}, {"id": "f13", "name": "Zurückgelegter Schmetterling", "img": "bilder/zurueckgelegter-schmetterling.png", "one": 0}, {"id": "f14", "name": "Wirbelsäulen-Twist", "img": "bilder/wirbelsaeulen-twist.png", "one": 1}, {"id": "f15", "name": "Oberschenkel-Streckung", "img": "bilder/oberschenkel-streckung.png", "one": 1}, {"id": "f16", "name": "Schmetterling", "img": "bilder/schmetterling.png", "one": 0}, {"id": "f17", "name": "Sitzend Zusammenfalten", "img": "bilder/sitzend-zusammenfalten.png", "one": 0}, {"id": "f18", "name": "Pflug", "img": "bilder/pflug.png", "one": 0}];
+const def={ver:2,rest:10,defSym:30,defOne:30,
+ex:FIX.map(f=>({id:f.id,name:f.name,desc:"",img:f.img,one:!!f.one,fixed:true})),
+routines:[{id:"r1",name:"Morgen",items:FIX.slice(0,9).map(f=>f.id)},{id:"r2",name:"Abend",items:FIX.slice(9).map(f=>f.id)}],
 done:[]};
 function load(){try{const r=localStorage.getItem(KEY);if(r){const s=JSON.parse(r);if(s.defSym==null){s.defSym=30;s.defOne=30;s.ex.forEach(e=>{if(e.sec===30)delete e.sec})}return mig(s)}}catch(e){}return mig(JSON.parse(JSON.stringify(def)))}
 let S=load(),V={n:"home"},P=null,T=null,AC=null,WL=null;
@@ -124,13 +130,13 @@ ${!nx&&!favs.length?'<p class="mut">Noch keine Favoriten. Markiere Routinen in d
 <div class="row"><button class="btn g" data-a="cal">Kalender</button></div>`}
 
 function play(){const w=P.phase==="work",sw=P.phase==="switch",e=ex(P.ids[P.idx]),nx=ex(P.ids[P.idx+1]),s=Math.ceil(P.left/1000),pos=Math.min(P.ids.length,P.idx+(P.phase==="rest"?2:1));
-const pv=pvOn();const title=pv?"NEXT":w?esc(e.name):sw?"Seitenwechsel":(P.idx<0?"Mach dich bereit":"Pause");
+const pv=pvOn(),imE=pv?nx:(w?e:null),im=imE&&imE.img?imE.img:"";const title=pv?"NEXT":w?esc(e.name):sw?"Seitenwechsel":(P.idx<0?"Mach dich bereit":"Pause");
 const sub=pv?esc(nx.name):w?(e.desc?esc(e.desc):""):sw?"Wechsle auf die andere Seite":"Als Nächstes: "+esc(nx.name);
 const foot=pv?"":w?(e.one&&P.side===1?"Danach: Seitenwechsel":(nx?"Danach: "+esc(nx.name):"Letzte Übung")):sw?"Danach: Seite 2 von 2":"";
 const side=w&&e.one&&!pv?"Seite "+P.side+" von 2":"";
 return `<div class="top"><button class="btn g sm" data-a="stop">Beenden</button><span class="mut">${esc(P.name)}, Übung ${pos} von ${P.ids.length}</span></div>
-<div class="ringw ${w?"":"rest"}"><svg viewBox="0 0 200 200"><circle class="tr" cx="100" cy="100" r="88"/><circle id="ring" class="pg" cx="100" cy="100" r="88" transform="rotate(-90 100 100)" style="stroke-dasharray:${C};stroke-dashoffset:${C*(1-P.left/P.total)}"/></svg><div id="t" class="num">${s}</div></div>
-<h1 class="c${pv?" nx":""}">${title}</h1><p id="sd" class="c side">${side}</p><p class="c">${sub}</p><p class="c mut">${foot}</p>
+<div class="ringw ${w?"":"rest"}${im?" hasimg":""}"><svg viewBox="0 0 200 200"><circle class="tr" cx="100" cy="100" r="88"/><circle id="ring" class="pg" cx="100" cy="100" r="88" transform="rotate(-90 100 100)" style="stroke-dasharray:${C};stroke-dashoffset:${C*(1-P.left/P.total)}"/></svg>${im?`<img class="pic" src="${esc(im)}" alt="">`:`<div id="t" class="num">${s}</div>`}</div>
+<h1 class="c${pv?" nx":""}">${title}</h1><p id="sd" class="c side">${side}</p><p class="c">${sub}</p><p class="c mut">${foot}</p>${im?`<div id="t" class="tm">${s}</div>`:""}
 <div class="row"><button class="btn g" style="padding:14px 8px" data-a="rw">⏪ 5 Sek.</button><button class="btn" style="padding:14px 8px" data-a="pause">${P.paused?"Weiter":"Pause"}</button><button class="btn g" style="padding:14px 8px" data-a="ff">⏩ 5 Sek.</button></div>
 <div class="row"><button class="btn g" data-a="skip">Überspringen</button></div>`}
 
@@ -142,7 +148,7 @@ return `<div class="top"><button class="btn g sm" data-a="nav" data-id="home">Zu
 <div class="card"><h2>Standarddauer</h2><label>Übung ohne Seitenwechsel (Sek.)<input type="number" inputmode="numeric" min="10" max="600" value="${S.defSym}" data-f="defSym"></label><label>Übung mit Seitenwechsel, pro Seite (Sek.)<input type="number" inputmode="numeric" min="10" max="600" value="${S.defOne}" data-f="defOne"></label></div>
 ${fbar()}
 
-${S.ex.filter(fx).map(e=>`<div class="card"><input data-f="name" data-id="${e.id}" value="${esc(e.name)}" aria-label="Name"><textarea data-f="desc" data-id="${e.id}" rows="2" placeholder="Beschreibung (optional)" aria-label="Beschreibung">${esc(e.desc)}</textarea><p class="mut" style="margin:8px 0 0">Gedehnter Körperteil</p><div class="chips">${pchips(e)}</div><label>Eigene Dauer${e.one?" pro Seite":""} in Sek. (leer = Standard)<input type="number" inputmode="numeric" min="10" max="600" value="${e.sec??""}" placeholder="${e.one?S.defOne:S.defSym}" data-f="sec" data-id="${e.id}"></label><label class="chk"><input type="checkbox" data-f="one" data-id="${e.id}" ${e.one?"checked":""}>Seitenwechsel</label><button class="btn g sm" data-a="delx" data-id="${e.id}">${V.cx===e.id?"Wirklich löschen?":"Löschen"}</button></div>`).join("")}
+${S.ex.filter(fx).map(e=>`<div class="card"><div class="hd">${e.img?`<img class="th" src="${esc(e.img)}" alt="">`:""}<input data-f="name" data-id="${e.id}" value="${esc(e.name)}" aria-label="Name"></div><textarea data-f="desc" data-id="${e.id}" rows="2" placeholder="Beschreibung (optional)" aria-label="Beschreibung">${esc(e.desc)}</textarea><p class="mut" style="margin:8px 0 0">Gedehnter Körperteil</p><div class="chips">${pchips(e)}</div><label>Eigene Dauer${e.one?" pro Seite":""} in Sek. (leer = Standard)<input type="number" inputmode="numeric" min="10" max="600" value="${e.sec??""}" placeholder="${e.one?S.defOne:S.defSym}" data-f="sec" data-id="${e.id}"></label><label class="chk"><input type="checkbox" data-f="one" data-id="${e.id}" ${e.one?"checked":""} ${e.fixed?"disabled":""}>Seitenwechsel${e.fixed?" (fest vorgegeben)":""}</label>${e.fixed?"":`<button class="btn g sm" data-a="delx" data-id="${e.id}">${V.cx===e.id?"Wirklich löschen?":"Löschen"}</button>`}</div>`).join("")}
 ${S.ex.filter(fx).length?"":'<p class="mut">Keine Übungen für diesen Körperteil.</p>'}
 <button class="plus" data-a="addx"><b>+</b>Neue Übung</button>`}
 
@@ -211,7 +217,12 @@ ${S.routines.map((r,i)=>{const k=r.items.filter(ex).length,f=isFav(r);return `<d
 <button class="plus" data-a="newr"><b>+</b>Neue Routine</button>`}
 
 function applyTheme(){const t=S.theme;if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);else document.documentElement.removeAttribute("data-theme")}
-function mig(s){if(!Array.isArray(s.plans)||!s.plans.length){s.plans=[{id:"p1",name:"Wochenplan",days:s.plan||{}}];delete s.plan}if(s.plans.every(x=>x.on===undefined)){const k=s.plans.some(x=>x.id===s.ap)?s.ap:s.plans[0].id;s.plans.forEach(x=>x.on=x.id===k)}delete s.ap;return s}
+function mig(s){if(!Array.isArray(s.ex))s.ex=[];if(!Array.isArray(s.routines))s.routines=[];
+if((s.ver||1)<2){const old=/^e([1-9]|10)$/;s.ex=[...FIX.map(f=>s.ex.find(e=>e.id===f.id)||{id:f.id,name:f.name,desc:""}),...s.ex.filter(e=>!old.test(e.id)&&!FIX.some(f=>f.id===e.id))];
+s.routines.forEach(r=>{const n=(r.items||[]).length;r.items=(r.items||[]).filter(i=>!old.test(i));const lost=n-r.items.length;if(r.secs)Object.keys(r.secs).forEach(i=>{if(old.test(i))delete r.secs[i]});
+if(lost&&(r.id==="r1"||r.id==="r2"))r.items=[...(r.id==="r1"?FIX.slice(0,9):FIX.slice(9)).map(f=>f.id),...r.items]});s.ver=2}
+FIX.forEach(f=>{let x=s.ex.find(e=>e.id===f.id);if(!x){x={id:f.id,name:f.name,desc:""};s.ex.push(x)}x.fixed=true;x.one=!!f.one;x.img=f.img});
+if(!Array.isArray(s.plans)||!s.plans.length){s.plans=[{id:"p1",name:"Wochenplan",days:s.plan||{}}];delete s.plan}if(s.plans.every(x=>x.on===undefined)){const k=s.plans.some(x=>x.id===s.ap)?s.ap:s.plans[0].id;s.plans.forEach(x=>x.on=x.id===k)}delete s.ap;return s}
 function norm(d){d.done=d.done||[];d.log=d.log||[];d.defSym=d.defSym??30;d.defOne=d.defOne??30;d.rest=d.rest??10;return mig(d)}
 async function exportB(){
 const name="dehn-backup-"+day()+".json",file=new File([JSON.stringify({app:"dehn-routinen",v:1,data:S},null,1)],name,{type:"application/json"});
@@ -306,13 +317,13 @@ else if(a==="cprev"||a==="cnext"){const t=new Date(V.y,V.m+(a==="cprev"?-1:1),1)
 else if(a==="tog"){const r=R();r.items=r.items.includes(id)?r.items.filter(x=>x!==id):[...r.items,id];save()}
 else if(a==="addtor"){const x={id:uid("e"),name:$("#nn").value.trim()||"E"+(S.ex.length+1),desc:"",p:FP?[FP]:[],one:$("#no").checked};const sv=parseInt($("#ns").value,10);if(!isNaN(sv))x.sec=Math.max(10,Math.min(600,sv));S.ex.push(x);R().items.push(x.id);V.nf=false;save()}
 else if(a==="addx"){S.ex.push({id:uid("e"),name:"E"+(S.ex.length+1),desc:"",p:FP?[FP]:[]});save()}
-else if(a==="delx"){if(V.cx!==id)V.cx=id;else{S.ex=S.ex.filter(x=>x.id!==id);S.routines.forEach(r=>r.items=r.items.filter(x=>x!==id));save();V.cx=null}}
+else if(a==="delx"){if(ex(id)&&ex(id).fixed){}else if(V.cx!==id)V.cx=id;else{S.ex=S.ex.filter(x=>x.id!==id);S.routines.forEach(r=>r.items=r.items.filter(x=>x!==id));save();V.cx=null}}
 render(["tog","addx","delx","addtor","up","dn","sel","cprev","cnext","rfav","rup","rdn","ptog","flt","ptgl","pall","psel","newp","pact","pdup","pdel","nfo","nfc","theme"].includes(a))});
 document.addEventListener("change",e=>{
 const t=e.target,f=t.dataset.f;if(!f)return;
 if(f==="rrest"){const v=parseInt(t.value,10);S.routines.find(r=>r.id===V.id).rest=Math.max(0,Math.min(120,isNaN(v)?10:v))}
 else if(f==="rname")S.routines.find(r=>r.id===V.id).name=t.value.trim()||"Routine";
-else if(f==="one"){ex(t.dataset.id).one=t.checked;render(1)}
+else if(f==="one"){const x=ex(t.dataset.id);if(!x.fixed)x.one=t.checked;render(1)}
 else if(f==="rsec"){const r=S.routines.find(r=>r.id===V.id),v=parseInt(t.value,10);r.secs=r.secs||{};if(isNaN(v))delete r.secs[t.dataset.id];else r.secs[t.dataset.id]=Math.max(10,Math.min(600,v));render(1)}
 else if(f==="defSym"||f==="defOne"){const v=parseInt(t.value,10);S[f]=Math.max(10,Math.min(600,isNaN(v)?30:v))}
 else if(f==="pon"){S.plans.find(x=>x.id===t.dataset.id).on=t.checked}
